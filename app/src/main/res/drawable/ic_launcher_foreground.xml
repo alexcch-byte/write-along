@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Writing lines with a cursive "a" on them. 108dp adaptive icon canvas, safe zone 18..90. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- paper -->
+    <path android:fillColor="#FFF8EC" android:pathData="M24,30h60a4,4 0,0 1,4 4v40a4,4 0,0 1,-4 4h-60a4,4 0,0 1,-4 -4v-40a4,4 0,0 1,4 -4z" />
+    <!-- top line -->
+    <path android:strokeColor="#5B6CF0" android:strokeWidth="1.6" android:pathData="M26,40H82" />
+    <!-- dashed middle line -->
+    <path android:strokeColor="#5B6CF0" android:strokeWidth="1.4" android:pathData="M26,54h4M34,54h4M42,54h4M50,54h4M58,54h4M66,54h4M74,54h4" />
+    <!-- bottom line -->
+    <path android:strokeColor="#E8505B" android:strokeWidth="1.8" android:pathData="M26,68H82" />
+    <!-- cursive letter -->
+    <path android:strokeColor="#2B2D42" android:strokeWidth="3.6" android:strokeLineCap="round" android:strokeLineJoin="round"
+        android:pathData="M30,68C36,68 42,58 50,55C44,52 38,56 38,62C38,68 44,69 48,64L52,55L50,66C50,69 55,69 58,65C62,60 66,56 70,54C66,56 64,62 66,66C68,69 74,68 78,64" />
+</vector>

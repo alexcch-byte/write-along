@@ -1,0 +1,13 @@
+{
+  "name": "Write Along",
+  "short_name": "Write Along",
+  "description": "Learn to write print and cursive letters the right way.",
+  "start_url": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#FFF8EC",
+  "theme_color": "#FFF8EC",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

@@ -1,0 +1,11 @@
+<resources>
+    <style name="Theme.WriteAlong" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/paper</item>
+        <item name="android:statusBarColor">@color/paper</item>
+        <item name="android:navigationBarColor">@color/paper</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <color name="paper">#FFF8EC</color>
+    <color name="icon_bg">#5B6CF0</color>
+</resources>
