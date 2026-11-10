@@ -55,15 +55,20 @@
     pickVoice() {
       if (!this.ok) return;
       const vs = speechSynthesis.getVoices();
-      this.voice = vs.find((v) => /en[-_]US/i.test(v.lang) && /female|samantha|aria|jenny|google us/i.test(v.name)) ||
-        vs.find((v) => /en[-_]US/i.test(v.lang)) || vs.find((v) => /^en/i.test(v.lang)) || null;
+      const gb = vs.filter((v) => /^en[-_]GB$/i.test(v.lang));
+      const male = /(?<!fe)male|daniel|george|ryan|thomas|oliver|arthur|rishi|alfie|noel/i;
+      const female = /female|libby|sonia|maisie|hazel|susan|kate|serena|stephanie|martha|fiona|amy|emma|google uk english female/i;
+      // A British female voice if the device has one; otherwise any British voice that is not male.
+      this.voice = gb.find((v) => female.test(v.name) && !male.test(v.name)) ||
+        gb.find((v) => !male.test(v.name)) || gb[0] ||
+        vs.find((v) => /^en/i.test(v.lang) && female.test(v.name)) || vs.find((v) => /^en/i.test(v.lang)) || null;
     },
     serial: 0,
     say(text) {
       if (!this.on || !this.ok || !text) return;
       const id = ++this.serial;
       const u = new SpeechSynthesisUtterance(text);
-      u.rate = 0.9; u.pitch = 1.1; u.lang = 'en-US';
+      u.rate = 0.9; u.pitch = 1.1; u.lang = 'en-GB';
       if (this.voice) u.voice = this.voice;
       if (speechSynthesis.speaking || speechSynthesis.pending) {
         // Chrome can drop a sentence spoken right after cancel(); give it a moment.

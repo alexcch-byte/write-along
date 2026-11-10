@@ -49,10 +49,17 @@ object Assignments {
         Assignment("p-sight", "Sight words", "👀", P, W, listOf("the", "and", "you", "said", "was")),
         Assignment("p-names", "Capital letters", "🏷️", P, W, listOf("Sam", "Mia", "Ben", "Ava")),
         Assignment("p-sentences", "Little sentences", "✏️", P, S, listOf("I can run", "The sun is hot", "We like to play")),
+        Assignment("p-blends", "Blend words", "🐸", P, W, listOf("frog", "clap", "stop", "drum", "snail", "plant")),
+        Assignment("p-long", "Long vowel words", "🚲", P, W, listOf("cake", "bike", "rain", "boat", "moon", "tree")),
+        Assignment("p-below", "Tails below the line", "🐛", P, W, listOf("pig", "jump", "yellow", "puppy", "queen", "giggle")),
+        Assignment("p-hard", "Challenge words", "🏔️", P, W, listOf("friend", "rainbow", "pumpkin", "birthday", "elephant", "butterfly")),
+        Assignment("p-hard-sentences", "Longer sentences", "📖", P, S, listOf("My friend has a yellow kitten", "The brown fox can jump high")),
         Assignment("c-pairs", "Cursive joins", "🔗", C, W, listOf("an", "in", "it", "on", "up")),
         Assignment("c-words", "Cursive words", "🌈", C, W, listOf("cat", "sun", "fish", "jump")),
         Assignment("c-sight", "Cursive sight words", "🌟", C, W, listOf("the", "and", "was", "you")),
         Assignment("c-sentences", "Cursive sentences", "💌", C, S, listOf("I love you", "Have a nice day")),
+        Assignment("c-blends", "Cursive blend words", "🐢", C, W, listOf("frog", "clap", "stop", "drum", "plant")),
+        Assignment("c-hard", "Cursive challenge words", "🏆", C, W, listOf("rainbow", "monkey", "yellow", "garden", "pumpkin", "butterfly")),
     )
 
     /** Tidies a typed name: "mia rose" -> "Mia Rose". */

@@ -84,15 +84,34 @@ class Speaker(context: Context, private val isEnabled: () -> Boolean) : TextToSp
 
     override fun onInit(status: Int) {
         if (status != TextToSpeech.SUCCESS) return
-        val result = tts.setLanguage(Locale.US)
+        val result = tts.setLanguage(Locale.UK)
         if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-            tts.setLanguage(Locale.getDefault())
+            if (tts.setLanguage(Locale.US) < TextToSpeech.LANG_AVAILABLE) tts.setLanguage(Locale.getDefault())
+        } else {
+            pickBritishFemale()
         }
         tts.setSpeechRate(0.9f)
         tts.setPitch(1.1f)
         ready = true
         pending?.let { say(it) }
         pending = null
+    }
+
+    /**
+     * Android has no "female" flag on voices, so we go by the voice names: Google's British
+     * female voices are en-gb-x-gba / gbc / gbg, and the male ones are gbb / gbd / rjs.
+     */
+    private fun pickBritishFemale() {
+        val british = try {
+            tts.voices.orEmpty().filter { it.locale.language == "en" && it.locale.country == "GB" && !it.isNetworkConnectionRequired }
+        } catch (_: Exception) {
+            emptyList()
+        }
+        val female = Regex("female|x-(gba|gbc|gbg|fis)\\b|-(gba|gbc|gbg)-", RegexOption.IGNORE_CASE)
+        val male = Regex("(?<!fe)male|x-(gbb|gbd|rjs)\\b|-(gbb|gbd|rjs)-", RegexOption.IGNORE_CASE)
+        val voice = british.firstOrNull { female.containsMatchIn(it.name) }
+            ?: british.firstOrNull { !male.containsMatchIn(it.name) }
+        if (voice != null) tts.voice = voice
     }
 
     fun say(text: String) {

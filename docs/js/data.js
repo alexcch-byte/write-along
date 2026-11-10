@@ -119,9 +119,16 @@ window.WA_DATA = {
 {"id":"p-sight","title":"Sight words","emoji":"👀","script":"print","kind":"words","items":["the","and","you","said","was"]},
 {"id":"p-names","title":"Capital letters","emoji":"🏷️","script":"print","kind":"words","items":["Sam","Mia","Ben","Ava"]},
 {"id":"p-sentences","title":"Little sentences","emoji":"✏️","script":"print","kind":"sentences","items":["I can run","The sun is hot","We like to play"]},
+{"id":"p-blends","title":"Blend words","emoji":"🐸","script":"print","kind":"words","items":["frog","clap","stop","drum","snail","plant"]},
+{"id":"p-long","title":"Long vowel words","emoji":"🚲","script":"print","kind":"words","items":["cake","bike","rain","boat","moon","tree"]},
+{"id":"p-below","title":"Tails below the line","emoji":"🐛","script":"print","kind":"words","items":["pig","jump","yellow","puppy","queen","giggle"]},
+{"id":"p-hard","title":"Challenge words","emoji":"🏔️","script":"print","kind":"words","items":["friend","rainbow","pumpkin","birthday","elephant","butterfly"]},
+{"id":"p-hard-sentences","title":"Longer sentences","emoji":"📖","script":"print","kind":"sentences","items":["My friend has a yellow kitten","The brown fox can jump high"]},
 {"id":"c-pairs","title":"Cursive joins","emoji":"🔗","script":"cursive","kind":"words","items":["an","in","it","on","up"]},
 {"id":"c-words","title":"Cursive words","emoji":"🌈","script":"cursive","kind":"words","items":["cat","sun","fish","jump"]},
 {"id":"c-sight","title":"Cursive sight words","emoji":"🌟","script":"cursive","kind":"words","items":["the","and","was","you"]},
-{"id":"c-sentences","title":"Cursive sentences","emoji":"💌","script":"cursive","kind":"sentences","items":["I love you","Have a nice day"]}
+{"id":"c-sentences","title":"Cursive sentences","emoji":"💌","script":"cursive","kind":"sentences","items":["I love you","Have a nice day"]},
+{"id":"c-blends","title":"Cursive blend words","emoji":"🐢","script":"cursive","kind":"words","items":["frog","clap","stop","drum","plant"]},
+{"id":"c-hard","title":"Cursive challenge words","emoji":"🏆","script":"cursive","kind":"words","items":["rainbow","monkey","yellow","garden","pumpkin","butterfly"]}
 ]
 };
