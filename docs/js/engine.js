@@ -154,7 +154,7 @@
     constructor(script, id, raw) {
       this.script = script;
       this.id = id;
-      this.slant = script === 'cursive' ? SLANT : 0;
+      this.slant = script === 'cursive' ? SLANT : script === 'calligraphy' ? DATA.calSlant : 0;
       this.raw = raw.s.map((s) => toPts(s.p));
       this.dots = raw.s.map((s) => !!s.d);
       this.says = raw.s.map((s) => s.t);
@@ -188,16 +188,18 @@
   /** Lays a word or sentence out in letter units. Cursive letters are joined. */
   function layoutText(text, script) {
     const strokes = [];
-    if (script === 'print') {
+    if (script !== 'cursive') {
+      // Print and calligraphy letters sit side by side, each with its own lift of the pen.
       let cursor = 0;
+      const gap = script === 'calligraphy' ? 12 : 14;
       [...text].forEach((ch, gi) => {
-        const g = Glyphs.get('print', ch);
+        const g = Glyphs.get(script, ch);
         if (!g) { cursor += 38; return; }
         const dx = cursor - g.bounds.minX;
         g.polylines.forEach((line, si) => {
           strokes.push({ points: line.map((p) => P(p.x + dx, p.y)), isDot: g.dots[si], glyph: gi, stroke: si });
         });
-        cursor += g.bounds.w + 14;
+        cursor += g.bounds.w + gap;
       });
     } else {
       let cursor = 0, prevExit = null, prevTan = null;
@@ -292,7 +294,7 @@
           cells.push(makeCell(cells.length, row, r, left, left + cellW, guide, placeGlyph(glyph, row, left + cellW / 2)));
         }
       });
-      return { rows, cells };
+      return { rows, cells, nib: glyph.script === 'calligraphy' };
     },
 
     /** One big letter for the Watch demonstration. */
@@ -300,7 +302,7 @@
       const margin = 14;
       const unit = Math.min(h / Paper.ROW, (w - 2 * margin) / (glyph.bounds.w + 80), 3.6);
       const row = makeRow((h - Paper.ROW * unit) / 2, unit, margin, w - margin);
-      return { rows: [row], cells: [makeCell(0, row, 0, margin, w - margin, 'faint', placeGlyph(glyph, row, w / 2))] };
+      return { rows: [row], cells: [makeCell(0, row, 0, margin, w - margin, 'faint', placeGlyph(glyph, row, w / 2))], nib: glyph.script === 'calligraphy' };
     },
 
     /** Free-writing paper, optionally with a word to trace (dotted rows, then faint rows). */
@@ -313,7 +315,7 @@
       for (let r = 0; r < rowsCount; r++) rows.push(makeRow(top0 + r * Paper.ROW * unit, unit, margin, w - margin));
       const cells = [];
       const trimmed = text.trim();
-      if (!trimmed) return { rows, cells };
+      if (!trimmed) return { rows, cells, nib: script === 'calligraphy' };
       const pad = 16;
       const maxUnits = (w - 2 * margin) / unit - 2 * pad;
       const lines = wrap(trimmed, script, maxUnits);
@@ -328,7 +330,7 @@
         }));
         cells.push(makeCell(cells.length, row, r, row.left, row.right, guide, ghosts));
       });
-      return { rows, cells };
+      return { rows, cells, nib: script === 'calligraphy' };
     },
 
     /** One assignment task: dotted first row, faint second (small lines), then empty rows. */
@@ -350,7 +352,7 @@
         }));
         return makeCell(r, row, r, row.left, row.right, guide, ghosts);
       });
-      return { rows, cells };
+      return { rows, cells, nib: script === 'calligraphy' };
     },
   };
 
@@ -604,6 +606,7 @@
       return [
         { id: 'name-print', title: 'My name', emoji: '😊', script: 'print', kind: 'name', items: [n, n] },
         { id: 'name-cursive', title: 'My name in cursive', emoji: '🖋️', script: 'cursive', kind: 'name', items: [n, n] },
+        { id: 'name-calligraphy', title: 'My name in calligraphy', emoji: '🎨', script: 'calligraphy', kind: 'name', items: [n, n] },
       ];
     },
     all(name) { return this.forName(name).concat(this.list); },

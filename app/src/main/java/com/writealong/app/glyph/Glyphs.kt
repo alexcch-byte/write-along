@@ -5,6 +5,7 @@ import kotlin.math.max
 object Glyphs {
     private val print: Map<Char, Glyph> = (PrintGlyphs.lowercase + PrintGlyphs.uppercase).associateBy { it.id }
     private val cursive: Map<Char, Glyph> = (CursiveGlyphs.lowercase + CursiveGlyphs.uppercase).associateBy { it.id }
+    private val calligraphy: Map<Char, Glyph> = (CalligraphyGlyphs.lowercase + CalligraphyGlyphs.uppercase).associateBy { it.id }
 
     val lowercase: List<Char> = ('a'..'z').toList()
     val uppercase: List<Char> = ('A'..'Z').toList()
@@ -12,6 +13,7 @@ object Glyphs {
     fun get(script: Script, ch: Char): Glyph? = when (script) {
         Script.PRINT -> print[ch]
         Script.CURSIVE -> cursive[ch]
+        Script.CALLIGRAPHY -> calligraphy[ch]
     }
 
     fun require(script: Script, ch: Char): Glyph = get(script, ch) ?: error("No $script glyph for '$ch'")
@@ -19,6 +21,7 @@ object Glyphs {
     fun all(script: Script): List<Glyph> = when (script) {
         Script.PRINT -> PrintGlyphs.lowercase + PrintGlyphs.uppercase
         Script.CURSIVE -> CursiveGlyphs.lowercase + CursiveGlyphs.uppercase
+        Script.CALLIGRAPHY -> CalligraphyGlyphs.lowercase + CalligraphyGlyphs.uppercase
     }
 }
 
@@ -36,17 +39,20 @@ class TextLine(val text: String, val strokes: List<TextStroke>) {
  */
 object TextLayout {
     private const val PRINT_GAP = 14f
+    private const val CALLIGRAPHY_GAP = 12f
     private const val CURSIVE_GAP = 6f
     private const val SPACE = 38f
 
     fun layout(text: String, script: Script): TextLine =
-        if (script == Script.PRINT) layoutPrint(text) else layoutCursive(text)
+        if (script == Script.CURSIVE) layoutCursive(text) else layoutPrint(text, script)
 
-    private fun layoutPrint(text: String): TextLine {
+    /** Print and calligraphy letters sit side by side, each with its own lift of the pen. */
+    private fun layoutPrint(text: String, script: Script): TextLine {
         val out = ArrayList<TextStroke>()
         var cursor = 0f
+        val gap = if (script == Script.CALLIGRAPHY) CALLIGRAPHY_GAP else PRINT_GAP
         text.forEachIndexed { gi, ch ->
-            val g = Glyphs.get(Script.PRINT, ch)
+            val g = Glyphs.get(script, ch)
             if (g == null) {
                 cursor += SPACE
                 return@forEachIndexed
@@ -55,7 +61,7 @@ object TextLayout {
             g.polylines.forEachIndexed { si, line ->
                 out += TextStroke(line.map { Pt(it.x + dx, it.y) }, g.strokes[si].isDot, gi, si)
             }
-            cursor += g.bounds.width + PRINT_GAP
+            cursor += g.bounds.width + gap
         }
         return TextLine(text, out)
     }

@@ -21,6 +21,7 @@ object Wa {
     val Primary = Color(0xFF5B6CF0)
     val PrintColor = Color(0xFFFF8A3D)
     val CursiveColor = Color(0xFF9B5DE5)
+    val CalligraphyColor = Color(0xFFC0395F)
     val FreeColor = Color(0xFF14B8A6)
     val Good = Color(0xFF22A861)
     val Warn = Color(0xFFE9A23B)
@@ -54,7 +55,11 @@ object Wa {
         Color(0xFF8E44AD),
     )
 
-    fun scriptColor(script: Script) = if (script == Script.PRINT) PrintColor else CursiveColor
+    fun scriptColor(script: Script) = when (script) {
+        Script.PRINT -> PrintColor
+        Script.CURSIVE -> CursiveColor
+        Script.CALLIGRAPHY -> CalligraphyColor
+    }
 }
 
 private val Rounded = FontFamily.SansSerif

@@ -174,6 +174,7 @@ fun LetterArt(
     lines: Boolean = true,
     weight: Float = 8f,
     padUnits: Float = 30f,
+    nib: Boolean = false,
 ) {
     Canvas(modifier) {
         val top = -18f
@@ -190,8 +191,8 @@ fun LetterArt(
             )
             drawLine(Wa.BaseLine.copy(alpha = 0.8f), Offset(0f, oy + 100f * u), Offset(size.width, oy + 100f * u), lw * 1.2f)
         }
-        val w = max(weight * u, 2.dp.toPx())
-        strokes.forEach { line -> drawInk(line.map { Pt(ox + it.x * u, oy + it.y * u) }, color, w) }
+        val w = max(weight * u, 2.dp.toPx()) * (if (nib) 0.75f else 1f)
+        strokes.forEach { line -> drawPen(nib, line.map { Pt(ox + it.x * u, oy + it.y * u) }, color, w) }
     }
 }
 

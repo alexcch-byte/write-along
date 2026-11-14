@@ -144,7 +144,7 @@ fun sampleSegments(segs: List<Seg>, step: Float = 1.5f): List<Pt> {
     return out
 }
 
-enum class Script(val label: String) { PRINT("Print"), CURSIVE("Cursive") }
+enum class Script(val label: String) { PRINT("Print"), CURSIVE("Cursive"), CALLIGRAPHY("Calligraphy") }
 
 /**
  * A letter, as a teacher would demonstrate it: an ordered list of strokes.

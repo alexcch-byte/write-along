@@ -9,7 +9,8 @@ stroke starts, which way it goes, and how letters sit on the writing lines.
 
 ## What's in it
 
-- **Print and Cursive letters** (a–z, A–Z). Each letter has three steps:
+- **Print, Cursive and Calligraphy letters** (a–z, A–Z). Calligraphy is an italic hand written with a
+  flat broad-edge pen: strokes across the nib come out thick and strokes along it hair thin. Each letter has three steps:
   1. **Watch**: the letter draws itself stroke by stroke while the steps are read aloud.
   2. **Trace**: follow a highlighted path with a numbered green start dot, arrows and a red stop dot.
      Each stroke is checked as soon as the finger lifts (wrong start, wrong way, off the path, too short).
@@ -27,7 +28,7 @@ stroke starts, which way it goes, and how letters sit on the writing lines.
 | Path | What it is |
 | --- | --- |
 | `app/` | Android app (Kotlin, Jetpack Compose) |
-| `app/src/main/java/.../glyph/` | Letter shapes and stroke order (`PrintGlyphs.kt`, `CursiveGlyphs.kt`), cursive joining |
+| `app/src/main/java/.../glyph/` | Letter shapes and stroke order (`PrintGlyphs.kt`, `CursiveGlyphs.kt`, `CalligraphyGlyphs.kt`), cursive joining |
 | `app/src/main/java/.../practice/` | Line layouts, tracing/writing checks, assignment list |
 | `docs/` | Web version, served by GitHub Pages (plain HTML/CSS/JS, no build step) |
 | `docs/js/data.js` | Letter data for the web, **generated** from the Android code (don't edit by hand) |

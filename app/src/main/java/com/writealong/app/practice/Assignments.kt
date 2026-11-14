@@ -37,6 +37,7 @@ class Assignment(
 object Assignments {
     private val P = Script.PRINT
     private val C = Script.CURSIVE
+    private val K = Script.CALLIGRAPHY
     private val W = Assignment.Kind.WORDS
     private val S = Assignment.Kind.SENTENCES
     private val L = Assignment.Kind.LETTERS
@@ -49,17 +50,24 @@ object Assignments {
         Assignment("p-sight", "Sight words", "👀", P, W, listOf("the", "and", "you", "said", "was")),
         Assignment("p-names", "Capital letters", "🏷️", P, W, listOf("Sam", "Mia", "Ben", "Ava")),
         Assignment("p-sentences", "Little sentences", "✏️", P, S, listOf("I can run", "The sun is hot", "We like to play")),
+        Assignment("p-sentences-2", "More sentences", "📝", P, S, listOf("I see a big dog", "The cat sat on the mat", "My mom can cook", "We go to school", "Look at the red bus")),
+        Assignment("p-animal-sentences", "Animal sentences", "🦁", P, S, listOf("A frog can jump", "Birds fly in the sky", "The fish swim in the lake", "My dog likes to run")),
         Assignment("p-blends", "Blend words", "🐸", P, W, listOf("frog", "clap", "stop", "drum", "snail", "plant")),
         Assignment("p-long", "Long vowel words", "🚲", P, W, listOf("cake", "bike", "rain", "boat", "moon", "tree")),
         Assignment("p-below", "Tails below the line", "🐛", P, W, listOf("pig", "jump", "yellow", "puppy", "queen", "giggle")),
         Assignment("p-hard", "Challenge words", "🏔️", P, W, listOf("friend", "rainbow", "pumpkin", "birthday", "elephant", "butterfly")),
-        Assignment("p-hard-sentences", "Longer sentences", "📖", P, S, listOf("My friend has a yellow kitten", "The brown fox can jump high")),
+        Assignment("p-hard-sentences", "Longer sentences", "📖", P, S, listOf("My friend has a yellow kitten", "The brown fox can jump high", "Our class has a garden", "I eat lunch with my friends", "Please wash your hands")),
         Assignment("c-pairs", "Cursive joins", "🔗", C, W, listOf("an", "in", "it", "on", "up")),
         Assignment("c-words", "Cursive words", "🌈", C, W, listOf("cat", "sun", "fish", "jump")),
         Assignment("c-sight", "Cursive sight words", "🌟", C, W, listOf("the", "and", "was", "you")),
-        Assignment("c-sentences", "Cursive sentences", "💌", C, S, listOf("I love you", "Have a nice day")),
+        Assignment("c-sentences", "Cursive sentences", "💌", C, S, listOf("I love you", "Have a nice day", "Thank you very much")),
+        Assignment("c-sentences-2", "More cursive sentences", "🌻", C, S, listOf("The sun is up", "I can write well", "We like to play", "Look at the moon", "Birds sing all day")),
+        Assignment("c-animal-sentences", "Cursive animal sentences", "🐰", C, S, listOf("The cat is happy", "A fish can swim", "My dog can jump", "Rabbits like carrots")),
         Assignment("c-blends", "Cursive blend words", "🐢", C, W, listOf("frog", "clap", "stop", "drum", "plant")),
         Assignment("c-hard", "Cursive challenge words", "🏆", C, W, listOf("rainbow", "monkey", "yellow", "garden", "pumpkin", "butterfly")),
+        Assignment("k-families", "Pen letter families", "🖌️", K, L, listOf("l i t", "n m h", "o a d", "u y j", "v w x")),
+        Assignment("k-words", "Calligraphy words", "✒️", K, W, listOf("Hello", "Happy", "Merry", "Peace", "Smile", "Dream")),
+        Assignment("k-cards", "Greeting card words", "💐", K, S, listOf("Be kind to all", "Dream big", "Happy birthday", "Thank you my friend", "Practice makes perfect")),
     )
 
     /** Tidies a typed name: "mia rose" -> "Mia Rose". */
@@ -73,6 +81,7 @@ object Assignments {
         return listOf(
             Assignment("name-print", "My name", "😊", P, Assignment.Kind.NAME, listOf(n, n)),
             Assignment("name-cursive", "My name in cursive", "🖋️", C, Assignment.Kind.NAME, listOf(n, n)),
+            Assignment("name-calligraphy", "My name in calligraphy", "🎨", K, Assignment.Kind.NAME, listOf(n, n)),
         )
     }
 

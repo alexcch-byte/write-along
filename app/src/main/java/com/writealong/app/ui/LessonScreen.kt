@@ -69,7 +69,7 @@ fun LessonScreen(script: Script, letter: Char, onBack: () -> Unit, onGoTo: (Char
             VGap(6.dp)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RoundButton("◀", "Previous letter", { onGoTo(prev) }, size = 36.dp)
-                LetterArt(glyph.polylines, glyph.bounds, color, Modifier.weight(1f).height(80.dp), padUnits = 34f)
+                LetterArt(glyph.polylines, glyph.bounds, color, Modifier.weight(1f).height(80.dp), padUnits = 34f, nib = script == Script.CALLIGRAPHY)
                 RoundButton("▶", "Next letter", { onGoTo(next) }, size = 36.dp)
             }
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {

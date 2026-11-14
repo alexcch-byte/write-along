@@ -88,7 +88,7 @@ fun HomeScreen(onScript: (Script) -> Unit, onFree: () -> Unit, onAssignments: ()
             Column(Modifier.weight(1f)) {
                 Text("Write Along ✏️", style = MaterialTheme.typography.displaySmall, color = Wa.Primary)
                 Text(
-                    "Learn to write every letter the right way, in print and cursive.",
+                    "Learn to write every letter the right way, in print, cursive and calligraphy.",
                     style = MaterialTheme.typography.bodyLarge,
                     color = Wa.SubText,
                 )
@@ -96,9 +96,10 @@ fun HomeScreen(onScript: (Script) -> Unit, onFree: () -> Unit, onAssignments: ()
             VoiceToggle()
         }
         VGap(16.dp)
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             val printSample = remember { TextLayout.layout("Aa", Script.PRINT) }
             val cursiveSample = remember { TextLayout.layout("Aa", Script.CURSIVE) }
+            val calligraphySample = remember { TextLayout.layout("Aa", Script.CALLIGRAPHY) }
             val freeSample = remember { TextLayout.layout("hi", Script.CURSIVE) }
             val taskSample = remember { TextLayout.layout("I can", Script.PRINT) }
             HomeCard(
@@ -112,6 +113,12 @@ fun HomeScreen(onScript: (Script) -> Unit, onFree: () -> Unit, onAssignments: ()
                 art = { LetterArt(cursiveSample.strokes.map { it.points }, cursiveSample.bounds, Wa.CursiveColor, it) },
                 footer = "⭐ ${progress.total(Script.CURSIVE, all)} / $maxStars",
                 onClick = { onScript(Script.CURSIVE) }, modifier = Modifier.weight(1f),
+            )
+            HomeCard(
+                title = "Calligraphy", subtitle = "Fancy pen letters", color = Wa.CalligraphyColor,
+                art = { LetterArt(calligraphySample.strokes.map { it.points }, calligraphySample.bounds, Wa.CalligraphyColor, it, nib = true) },
+                footer = "⭐ ${progress.total(Script.CALLIGRAPHY, all)} / $maxStars",
+                onClick = { onScript(Script.CALLIGRAPHY) }, modifier = Modifier.weight(1f),
             )
             HomeCard(
                 title = "Free Write", subtitle = "Words on big or small lines", color = Wa.FreeColor,
@@ -190,7 +197,7 @@ fun LettersScreen(script: Script, onBack: () -> Unit, onLetter: (Char) -> Unit, 
             Gap(12.dp)
             Column(Modifier.weight(1f)) {
                 Text("${script.label} letters", style = MaterialTheme.typography.headlineMedium, color = color)
-                Text("Pick a letter to learn.", style = MaterialTheme.typography.bodyMedium, color = Wa.SubText)
+                Text(if (script == Script.CALLIGRAPHY) "Pick a letter. Picture a flat pen tilted like a slanted roof." else "Pick a letter to learn.", style = MaterialTheme.typography.bodyMedium, color = Wa.SubText)
             }
             ChoiceRow(
                 options = listOf(false, true), selected = upper,
@@ -219,7 +226,7 @@ fun LettersScreen(script: Script, onBack: () -> Unit, onLetter: (Char) -> Unit, 
                     shadowElevation = 2.dp,
                 ) {
                     Column(Modifier.padding(vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        LetterArt(glyph.polylines, glyph.bounds, color, Modifier.fillMaxWidth().height(84.dp), padUnits = 44f)
+                        LetterArt(glyph.polylines, glyph.bounds, color, Modifier.fillMaxWidth().height(84.dp), padUnits = 44f, nib = script == Script.CALLIGRAPHY)
                         StarRow(progress.stars(script, ch), 15.dp)
                     }
                 }

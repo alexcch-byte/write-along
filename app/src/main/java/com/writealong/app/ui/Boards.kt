@@ -312,9 +312,9 @@ private fun DrawScope.drawBoard(state: BoardState, measurer: TextMeasurer, pulse
     sheet.cells.forEach { drawGuide(state, it, measurer, pulse) }
 
     val inkW = inkWidth(sheet.unit)
-    state.inks.forEach { drawInk(it.points, it.color, inkW) }
-    state.rejected?.let { if (rejectAlpha > 0.01f) drawInk(it, Wa.Bad, inkW, rejectAlpha) }
-    if (state.current.isNotEmpty()) drawInk(state.current.toList(), state.penColor, inkW)
+    state.inks.forEach { drawPen(sheet.nib, it.points, it.color, inkW) }
+    state.rejected?.let { if (rejectAlpha > 0.01f) drawPen(sheet.nib, it, Wa.Bad, inkW, rejectAlpha) }
+    if (state.current.isNotEmpty()) drawPen(sheet.nib, state.current.toList(), state.penColor, inkW)
 
     state.results.forEach { (idx, score) ->
         val cell = sheet.cells[idx]
@@ -374,7 +374,12 @@ private fun DrawScope.drawGuide(state: BoardState, cell: Cell, measurer: TextMea
         }
         Guide.FAINT -> {
             val w = max(3.2f * u, 2.4.dp.toPx())
-            cell.strokes.forEach { drawRoad(it.points, it.isDot, Wa.Faint, if (it.isDot) w * 1.8f else w) }
+            if (state.sheet.nib) {
+                val nibLen = inkWidth(state.sheet.unit) * 1.5f
+                cell.strokes.forEach { drawNibStroke(it.points, Wa.Faint, nibLen) }
+            } else {
+                cell.strokes.forEach { drawRoad(it.points, it.isDot, Wa.Faint, if (it.isDot) w * 1.8f else w) }
+            }
         }
         Guide.NONE -> {}
     }
@@ -428,13 +433,13 @@ fun WatchBoard(glyph: Glyph, playKey: Int, color: Color, onCaption: (String) -> 
             val inkW = max(6.5f * u, 4.dp.toPx())
             cell.strokes.forEachIndexed { i, s ->
                 when {
-                    i < strokeNow -> drawInk(s.points, color, inkW)
+                    i < strokeNow -> drawPen(sheet.nib, s.points, color, inkW)
                     i == strokeNow -> {
                         if (s.isDot) {
-                            if (frac > 0.3f) drawInk(s.points, color, inkW)
+                            if (frac > 0.3f) drawPen(sheet.nib, s.points, color, inkW)
                         } else {
                             val part = prefix(s.points, pathLength(s.points) * frac)
-                            drawInk(part, color, inkW)
+                            drawPen(sheet.nib, part, color, inkW)
                             val tip = part.last()
                             drawCircle(Color.White, inkW * 1.25f, tip.o())
                             drawCircle(Wa.Text, inkW * 0.85f, tip.o())

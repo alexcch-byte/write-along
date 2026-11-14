@@ -28,7 +28,7 @@ class AssignmentTest {
     fun nameIsTidied() {
         assertEquals("Mia Rose", Assignments.formatName("  mIA   rose "))
         assertTrue(Assignments.nameAssignments("   ").isEmpty())
-        assertEquals(2, Assignments.nameAssignments("sam").size)
+        assertEquals(3, Assignments.nameAssignments("sam").size)
     }
 
     @Test
