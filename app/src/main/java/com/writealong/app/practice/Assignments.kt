@@ -67,7 +67,8 @@ object Assignments {
         Assignment("c-hard", "Cursive challenge words", "🏆", C, W, listOf("rainbow", "monkey", "yellow", "garden", "pumpkin", "butterfly")),
         Assignment("k-families", "Pen letter families", "🖌️", K, L, listOf("l i t", "n m h", "o a d", "u y j", "v w x")),
         Assignment("k-words", "Calligraphy words", "✒️", K, W, listOf("Hello", "Happy", "Merry", "Peace", "Smile", "Dream")),
-        Assignment("k-cards", "Greeting card words", "💐", K, S, listOf("Be kind to all", "Dream big", "Happy birthday", "Thank you my friend", "Practice makes perfect")),
+        Assignment("k-fancy", "Fancy words", "💎", K, W, listOf("Elegant", "Beautiful", "Wonderful", "Brilliant", "Gorgeous")),
+        Assignment("k-cards", "Greeting card words", "💐", K, S, listOf("Be kind to all", "Dream big", "Happy birthday", "Thank you my friend", "Practice makes perfect", "Welcome home", "You are amazing", "Happy holidays")),
     )
 
     /** Tidies a typed name: "mia rose" -> "Mia Rose". */

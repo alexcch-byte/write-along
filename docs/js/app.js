@@ -276,7 +276,7 @@
   }
 
   /* A flat, broad-edge calligraphy pen: thick across the nib, hair thin along it. */
-  const NIB_ANGLE = 45, NIB_MIN = 0.16, NIB_RATIO = 1.5;
+  const NIB_ANGLE = 45, NIB_MIN = 0.12, NIB_RATIO = 1.5;
 
   function drawPen(ctx, nib, pts, color, width, alpha) {
     if (nib) drawNib(ctx, pts, color, width * NIB_RATIO, alpha); else drawInk(ctx, pts, color, width, alpha);
