@@ -375,8 +375,8 @@ private fun DrawScope.drawGuide(state: BoardState, cell: Cell, measurer: TextMea
         Guide.FAINT -> {
             val w = max(3.2f * u, 2.4.dp.toPx())
             if (state.sheet.nib) {
-                val nibLen = inkWidth(state.sheet.unit) * 1.5f
-                cell.strokes.forEach { drawNibStroke(it.points, Wa.Faint, nibLen) }
+                val penW = inkWidth(state.sheet.unit)
+                cell.strokes.forEach { drawPointedStroke(it.points, Wa.Faint, penW) }
             } else {
                 cell.strokes.forEach { drawRoad(it.points, it.isDot, Wa.Faint, if (it.isDot) w * 1.8f else w) }
             }

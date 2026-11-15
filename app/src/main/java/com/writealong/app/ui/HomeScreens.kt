@@ -88,7 +88,7 @@ fun HomeScreen(onScript: (Script) -> Unit, onFree: () -> Unit, onAssignments: ()
             Column(Modifier.weight(1f)) {
                 Text("Write Along ✏️", style = MaterialTheme.typography.displaySmall, color = Wa.Primary)
                 Text(
-                    "Learn to write every letter the right way, in print, cursive and calligraphy.",
+                    "Learn to write every letter the right way, in print, cursive and copperplate.",
                     style = MaterialTheme.typography.bodyLarge,
                     color = Wa.SubText,
                 )
@@ -99,7 +99,7 @@ fun HomeScreen(onScript: (Script) -> Unit, onFree: () -> Unit, onAssignments: ()
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             val printSample = remember { TextLayout.layout("Aa", Script.PRINT) }
             val cursiveSample = remember { TextLayout.layout("Aa", Script.CURSIVE) }
-            val calligraphySample = remember { TextLayout.layout("Aa", Script.CALLIGRAPHY) }
+            val copperplateSample = remember { TextLayout.layout("Aa", Script.COPPERPLATE) }
             val freeSample = remember { TextLayout.layout("hi", Script.CURSIVE) }
             val taskSample = remember { TextLayout.layout("I can", Script.PRINT) }
             HomeCard(
@@ -115,10 +115,10 @@ fun HomeScreen(onScript: (Script) -> Unit, onFree: () -> Unit, onAssignments: ()
                 onClick = { onScript(Script.CURSIVE) }, modifier = Modifier.weight(1f),
             )
             HomeCard(
-                title = "Calligraphy", subtitle = "Fancy pen letters", color = Wa.CalligraphyColor,
-                art = { LetterArt(calligraphySample.strokes.map { it.points }, calligraphySample.bounds, Wa.CalligraphyColor, it, nib = true) },
-                footer = "⭐ ${progress.total(Script.CALLIGRAPHY, all)} / $maxStars",
-                onClick = { onScript(Script.CALLIGRAPHY) }, modifier = Modifier.weight(1f),
+                title = "Copperplate", subtitle = "Fancy slanted script", color = Wa.CopperplateColor,
+                art = { LetterArt(copperplateSample.strokes.map { it.points }, copperplateSample.bounds, Wa.CopperplateColor, it, nib = true) },
+                footer = "⭐ ${progress.total(Script.COPPERPLATE, all)} / $maxStars",
+                onClick = { onScript(Script.COPPERPLATE) }, modifier = Modifier.weight(1f),
             )
             HomeCard(
                 title = "Free Write", subtitle = "Words on big or small lines", color = Wa.FreeColor,
@@ -197,7 +197,7 @@ fun LettersScreen(script: Script, onBack: () -> Unit, onLetter: (Char) -> Unit, 
             Gap(12.dp)
             Column(Modifier.weight(1f)) {
                 Text("${script.label} letters", style = MaterialTheme.typography.headlineMedium, color = color)
-                Text(if (script == Script.CALLIGRAPHY) "Pick a letter. Picture a flat pen tilted like a slanted roof." else "Pick a letter to learn.", style = MaterialTheme.typography.bodyMedium, color = Wa.SubText)
+                Text(if (script == Script.COPPERPLATE) "Pick a letter. Press lightly going up and press harder going down." else "Pick a letter to learn.", style = MaterialTheme.typography.bodyMedium, color = Wa.SubText)
             }
             ChoiceRow(
                 options = listOf(false, true), selected = upper,
@@ -226,7 +226,7 @@ fun LettersScreen(script: Script, onBack: () -> Unit, onLetter: (Char) -> Unit, 
                     shadowElevation = 2.dp,
                 ) {
                     Column(Modifier.padding(vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        LetterArt(glyph.polylines, glyph.bounds, color, Modifier.fillMaxWidth().height(84.dp), padUnits = 44f, nib = script == Script.CALLIGRAPHY)
+                        LetterArt(glyph.polylines, glyph.bounds, color, Modifier.fillMaxWidth().height(84.dp), padUnits = 44f, nib = script == Script.COPPERPLATE)
                         StarRow(progress.stars(script, ch), 15.dp)
                     }
                 }

@@ -14,12 +14,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.writealong.app.glyph.Nib
+import com.writealong.app.glyph.CopperplateGlyphs
 import com.writealong.app.glyph.Pt
 import com.writealong.app.glyph.pathLength
 import com.writealong.app.glyph.pointAlong
+import com.writealong.app.glyph.resample
 import com.writealong.app.practice.PaperRow
 import kotlin.math.PI
+import kotlin.math.atan
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sin
@@ -103,37 +105,32 @@ fun DrawScope.drawInk(pts: List<Pt>, color: Color, width: Float, alpha: Float = 
     drawPath(inkPath(pts), color, alpha = alpha, style = Stroke(width, cap = StrokeCap.Round, join = StrokeJoin.Round))
 }
 
-/** How wide the flat nib is compared with the round pen of the same ink width. */
-private const val NIB_RATIO = 1.5f
+/** Width of a pointed-pen hairline and of a full shade, as a multiple of the round pen's width. */
+private const val PEN_HAIR = 0.3f
+private const val PEN_SHADE = 1.8f
 
 /**
- * Ink or pencil: with [nib] the stroke is written with a flat, broad-edge calligraphy pen
- * (thick across the nib, hair thin along it); otherwise it is a round pen.
+ * Ink or pencil: with [nib] the stroke is written with a pointed copperplate pen (hair thin
+ * going up and across, thick on downstrokes); otherwise it is a round pen.
  */
 fun DrawScope.drawPen(nib: Boolean, pts: List<Pt>, color: Color, width: Float, alpha: Float = 1f) {
-    if (nib) drawNibStroke(pts, color, width * NIB_RATIO, alpha) else drawInk(pts, color, width, alpha)
+    if (nib) drawPointedStroke(pts, color, width, alpha) else drawInk(pts, color, width, alpha)
 }
 
 /**
- * Sweeps a flat nib along [pts]. The nib is a short straight edge [nibLen] long, held at
- * [Nib.ANGLE_DEG] (rising to the right). Every step of the path becomes a parallelogram, so a
- * stroke that runs along the nib edge is hair thin and one that crosses it is thick.
+ * Pointed-pen line. The nib opens when you press, so the line is a hairline on upstrokes and
+ * across, and swells into a thick shade whenever the pen travels down along the slant of the
+ * letters. [width] is the width of a round pen for the same ink.
  */
-fun DrawScope.drawNibStroke(pts: List<Pt>, color: Color, nibLen: Float, alpha: Float = 1f) {
+fun DrawScope.drawPointedStroke(pts: List<Pt>, color: Color, width: Float, alpha: Float = 1f) {
     if (pts.isEmpty()) return
-    val ang = Nib.ANGLE_DEG * PI.toFloat() / 180f
-    val hx = cos(ang) * nibLen / 2f
-    val hy = -sin(ang) * nibLen / 2f
-    val first = pts.first()
-    if (pts.size == 1 || pathLength(pts) < nibLen * 0.3f) {
-        // A dot is a small diamond-ish stamp of the nib.
-        drawLine(
-            color, Offset(first.x - hx * 0.9f, first.y - hy * 0.9f), Offset(first.x + hx * 0.9f, first.y + hy * 0.9f),
-            nibLen * 0.34f, cap = StrokeCap.Butt, alpha = alpha,
-        )
+    val hair = max(width * PEN_HAIR, 1f)
+    val shade = max(width * PEN_SHADE, hair * 2f)
+    if (pts.size == 1 || pathLength(pts) < width * 0.5f) {
+        drawCircle(color, shade * 0.4f, pts.first().o(), alpha = alpha)
         return
     }
-    // Light smoothing, then drop points that are too close together to matter.
+    // Light smoothing, then even spacing so the widths change smoothly along the stroke.
     val sm = ArrayList<Pt>(pts.size)
     for (i in pts.indices) {
         val a = pts[max(i - 1, 0)]
@@ -141,20 +138,49 @@ fun DrawScope.drawNibStroke(pts: List<Pt>, color: Color, nibLen: Float, alpha: F
         val c = pts[minOf(i + 1, pts.lastIndex)]
         sm += if (i == 0 || i == pts.lastIndex) b else Pt((a.x + 2 * b.x + c.x) / 4f, (a.y + 2 * b.y + c.y) / 4f)
     }
-    val minStep = max(nibLen / 14f, 1f)
-    val line = ArrayList<Pt>(sm.size)
-    line += sm.first()
-    for (i in 1 until sm.size) {
-        if (sm[i].dist(line.last()) >= minStep || i == sm.lastIndex) line += sm[i]
+    val step = max(width / 3f, 1.2f)
+    val n = max(3, (pathLength(sm) / step).toInt() + 1)
+    val line = resample(sm, n)
+
+    // Pressure: how far each step runs down along the slant of the letters.
+    val th = atan(CopperplateGlyphs.SLANT)
+    val downX = -sin(th)
+    val downY = cos(th)
+    val w = FloatArray(n)
+    var run = 0f
+    for (i in 0 until n) {
+        if (i > 0) run += line[i].dist(line[i - 1])
+        val a = line[max(i - 3, 0)]
+        val b = line[minOf(i + 3, n - 1)]
+        val d = (b - a).normalized()
+        val x = ((d.x * downX + d.y * downY) - 0.2f) / 0.6f
+        val t = x.coerceIn(0f, 1f).let { it * it * (3f - 2f * it) }
+        // A shade swells in over the first stretch of the stroke instead of starting blunt.
+        val ramp = (0.4f + 0.6f * (run / (shade * 2.5f))).coerceAtMost(1f)
+        w[i] = hair + (shade - hair) * t * ramp
     }
+    repeat(4) {
+        var prev = w[0]
+        for (i in 1 until n - 1) {
+            val cur = w[i]
+            w[i] = (prev + 2f * cur + w[i + 1]) / 4f
+            prev = cur
+        }
+    }
+
+    // Every piece is wound the same way, so pieces never cancel each other out.
     val body = Path()
-    for (i in 1 until line.size) {
+    for (i in 1 until n) {
         val p = line[i - 1]
         val q = line[i]
-        // Corners in an order that keeps every piece wound the same way, so pieces never cancel.
+        val d = (q - p).normalized()
+        val nx = -d.y
+        val ny = d.x
+        val hp = w[i - 1] / 2f
+        val hq = w[i] / 2f
         val v = arrayOf(
-            Offset(p.x - hx, p.y - hy), Offset(p.x + hx, p.y + hy),
-            Offset(q.x + hx, q.y + hy), Offset(q.x - hx, q.y - hy),
+            Offset(p.x + nx * hp, p.y + ny * hp), Offset(q.x + nx * hq, q.y + ny * hq),
+            Offset(q.x - nx * hq, q.y - ny * hq), Offset(p.x - nx * hp, p.y - ny * hp),
         )
         var area = 0f
         for (k in 0 until 4) {
@@ -167,11 +193,23 @@ fun DrawScope.drawNibStroke(pts: List<Pt>, color: Color, nibLen: Float, alpha: F
         for (k in 1 until 4) body.lineTo(v[k].x, v[k].y)
         body.close()
     }
-    // Hair line under the body so strokes along the nib edge never vanish.
-    drawPath(
-        polyPath(line), color, alpha = alpha,
-        style = Stroke(max(nibLen * Nib.MIN_FRACTION, 1f), cap = StrokeCap.Round, join = StrokeJoin.Round),
-    )
+    // Round the ends and every bend with small discs.
+    for (i in 0 until n) {
+        val turn = if (i == 0 || i == n - 1) 1f else {
+            val d1 = (line[i] - line[i - 1]).normalized()
+            val d2 = (line[i + 1] - line[i]).normalized()
+            1f - (d1.x * d2.x + d1.y * d2.y)
+        }
+        if (turn < 0.01f) continue
+        val r = w[i] / 2f
+        for (k in 0 until 8) {
+            val ang = k * (2.0 * PI / 8.0)
+            val x = line[i].x + r * cos(ang).toFloat()
+            val y = line[i].y + r * sin(ang).toFloat()
+            if (k == 0) body.moveTo(x, y) else body.lineTo(x, y)
+        }
+        body.close()
+    }
     drawPath(body, color, alpha = alpha)
 }
 

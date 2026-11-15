@@ -11,7 +11,7 @@
   const APK_URL = REPO_URL + '/releases/latest/download/WriteAlong.apk';
 
   const C = {
-    text: '#2B2D42', sub: '#6B6F80', primary: '#5B6CF0', print: '#FF8A3D', cursive: '#9B5DE5', calligraphy: '#C0395F', free: '#14B8A6',
+    text: '#2B2D42', sub: '#6B6F80', primary: '#5B6CF0', print: '#FF8A3D', cursive: '#9B5DE5', copperplate: '#C0395F', free: '#14B8A6',
     good: '#22A861', warn: '#E9A23B', bad: '#E5484D', star: '#FFC233', starEmpty: '#E3DED3',
     topLine: '#5B6CF0', midLine: '#8C98F5', baseLine: '#E5484D', tailLine: '#C9C3B8', zone: 'rgba(91,108,240,0.06)',
     road: '#E4E1DA', roadActive: '#FFE3A3', roadDone: '#C8EED6', dotted: '#9A97A0', faint: 'rgba(133,130,144,0.22)',
@@ -19,7 +19,7 @@
   };
   const PENS = ['#2B2D42', '#2F6BFF', '#E63946', '#16A34A', '#8E44AD'];
   const scriptColor = (s) => C[s] || C.cursive;
-  const scriptLabel = (s) => ({ print: 'Print', cursive: 'Cursive', calligraphy: 'Calligraphy' }[s] || 'Print');
+  const scriptLabel = (s) => ({ print: 'Print', cursive: 'Cursive', copperplate: 'Copperplate' }[s] || 'Print');
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
   /* ------------------------------------------------------------------ storage */
@@ -275,23 +275,22 @@
     strokeRound(ctx, color, width, alpha);
   }
 
-  /* A flat, broad-edge calligraphy pen: thick across the nib, hair thin along it. */
-  const NIB_ANGLE = 45, NIB_MIN = 0.12, NIB_RATIO = 1.5;
+  /* A pointed copperplate pen: hair thin going up and across, a thick shade on every downstroke. */
+  const PEN_HAIR = 0.3, PEN_SHADE = 1.8;
 
   function drawPen(ctx, nib, pts, color, width, alpha) {
-    if (nib) drawNib(ctx, pts, color, width * NIB_RATIO, alpha); else drawInk(ctx, pts, color, width, alpha);
+    if (nib) drawPointed(ctx, pts, color, width, alpha); else drawInk(ctx, pts, color, width, alpha);
   }
 
-  function drawNib(ctx, pts, color, nibLen, alpha) {
+  function drawPointed(ctx, pts, color, width, alpha) {
     if (!pts.length) return;
-    const ang = NIB_ANGLE * Math.PI / 180;
-    const hx = Math.cos(ang) * nibLen / 2, hy = -Math.sin(ang) * nibLen / 2;
-    const first = pts[0];
+    const hair = Math.max(width * PEN_HAIR, 1);
+    const shade = Math.max(width * PEN_SHADE, hair * 2);
     ctx.save();
     ctx.globalAlpha = alpha == null ? 1 : alpha;
-    if (pts.length === 1 || pathLength(pts) < nibLen * 0.3) {
-      ctx.strokeStyle = color; ctx.lineWidth = nibLen * 0.34; ctx.lineCap = 'butt';
-      ctx.beginPath(); ctx.moveTo(first.x - hx * 0.9, first.y - hy * 0.9); ctx.lineTo(first.x + hx * 0.9, first.y + hy * 0.9); ctx.stroke();
+    ctx.fillStyle = color;
+    if (pts.length === 1 || pathLength(pts) < width * 0.5) {
+      ctx.beginPath(); ctx.arc(pts[0].x, pts[0].y, shade * 0.4, 0, Math.PI * 2); ctx.fill();
       ctx.restore();
       return;
     }
@@ -300,24 +299,56 @@
       const a = pts[i - 1], c = pts[i + 1];
       return P((a.x + 2 * b.x + c.x) / 4, (a.y + 2 * b.y + c.y) / 4);
     });
-    const minStep = Math.max(nibLen / 14, 1);
-    const line = [sm[0]];
-    for (let i = 1; i < sm.length; i++) {
-      if (dist(sm[i], line[line.length - 1]) >= minStep || i === sm.length - 1) line.push(sm[i]);
+    const step = Math.max(width / 3, 1.2);
+    const n = Math.max(3, Math.floor(pathLength(sm) / step) + 1);
+    const line = window.WA.resample(sm, n);
+    // Pressure: how far each step runs down along the slant of the letters.
+    const th = Math.atan(window.WA_DATA.cpSlant);
+    const downX = -Math.sin(th), downY = Math.cos(th);
+    let w = new Array(n), run = 0;
+    for (let i = 0; i < n; i++) {
+      if (i > 0) run += dist(line[i], line[i - 1]);
+      const a = line[Math.max(i - 3, 0)], b = line[Math.min(i + 3, n - 1)];
+      const len = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+      const x = Math.min(1, Math.max(0, (((b.x - a.x) * downX + (b.y - a.y) * downY) / len - 0.2) / 0.6));
+      const t = x * x * (3 - 2 * x);
+      const ramp = Math.min(1, 0.4 + 0.6 * (run / (shade * 2.5)));
+      w[i] = hair + (shade - hair) * t * ramp;
     }
-    // Hair line under the body so strokes along the nib edge never vanish.
-    polyPath(ctx, line);
-    strokeRound(ctx, color, Math.max(nibLen * NIB_MIN, 1));
-    ctx.fillStyle = color;
+    for (let pass = 0; pass < 4; pass++) {
+      let prev = w[0];
+      for (let i = 1; i < n - 1; i++) { const cur = w[i]; w[i] = (prev + 2 * cur + w[i + 1]) / 4; prev = cur; }
+    }
+    // Every piece is wound the same way, so pieces never cancel each other out.
     ctx.beginPath();
-    for (let i = 1; i < line.length; i++) {
+    for (let i = 1; i < n; i++) {
       const p = line[i - 1], q = line[i];
-      let v = [[p.x - hx, p.y - hy], [p.x + hx, p.y + hy], [q.x + hx, q.y + hy], [q.x - hx, q.y - hy]];
+      const len = Math.hypot(q.x - p.x, q.y - p.y) || 1;
+      const nx = -(q.y - p.y) / len, ny = (q.x - p.x) / len;
+      const hp = w[i - 1] / 2, hq = w[i] / 2;
+      let v = [[p.x + nx * hp, p.y + ny * hp], [q.x + nx * hq, q.y + ny * hq], [q.x - nx * hq, q.y - ny * hq], [p.x - nx * hp, p.y - ny * hp]];
       let area = 0;
       for (let k = 0; k < 4; k++) { const a = v[k], b = v[(k + 1) % 4]; area += a[0] * b[1] - b[0] * a[1]; }
-      if (area < 0) v = v.reverse();   // every piece wound the same way, so pieces never cancel
+      if (area < 0) v = v.reverse();
       ctx.moveTo(v[0][0], v[0][1]);
       for (let k = 1; k < 4; k++) ctx.lineTo(v[k][0], v[k][1]);
+      ctx.closePath();
+    }
+    // Round the ends and every bend with small discs.
+    for (let i = 0; i < n; i++) {
+      let turn = 1;
+      if (i > 0 && i < n - 1) {
+        const l1 = Math.hypot(line[i].x - line[i - 1].x, line[i].y - line[i - 1].y) || 1;
+        const l2 = Math.hypot(line[i + 1].x - line[i].x, line[i + 1].y - line[i].y) || 1;
+        turn = 1 - ((line[i].x - line[i - 1].x) * (line[i + 1].x - line[i].x) + (line[i].y - line[i - 1].y) * (line[i + 1].y - line[i].y)) / (l1 * l2);
+      }
+      if (turn < 0.01) continue;
+      const r = w[i] / 2;
+      for (let k = 0; k < 8; k++) {
+        const ang = k * Math.PI / 4;
+        const x = line[i].x + r * Math.cos(ang), y = line[i].y + r * Math.sin(ang);
+        if (k === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
       ctx.closePath();
     }
     ctx.fill('nonzero');
@@ -649,8 +680,8 @@
       } else if (cell.guide === 'faint') {
         const w = Math.max(3.2 * u, 2.4);
         if (this.sheet.nib) {
-          const nibLen = Math.max(5.5 * this.sheet.rows[0].unit, 3.5) * NIB_RATIO;
-          for (const s of cell.strokes) drawNib(ctx, s.points, C.faint, nibLen);
+          const penW = Math.max(5.5 * this.sheet.rows[0].unit, 3.5);
+          for (const s of cell.strokes) drawPointed(ctx, s.points, C.faint, penW);
         } else {
           for (const s of cell.strokes) drawRoad(ctx, s.points, s.isDot, C.faint, s.isDot ? w * 1.8 : w);
         }
@@ -784,20 +815,20 @@
     const card = (title, sub, color, text, script, footer, href) => {
       const laid = layoutText(text, script);
       return h('a', { class: 'card', href, '--c': color },
-        letterArt(laid.strokes.map((s) => s.points), laid.bounds, color, { height: 110, nib: script === 'calligraphy' }),
+        letterArt(laid.strokes.map((s) => s.points), laid.bounds, color, { height: 110, nib: script === 'copperplate' }),
         h('div', { class: 't' }, title), h('div', { class: 's' }, sub), h('div', { class: 'f' }, footer));
     };
     const tip = (e, t) => h('div', { class: 'tip' }, h('span', { class: 'e', 'aria-hidden': 'true' }, e), h('span', null, t));
     const el = h('div', { class: 'scroll' },
       h('div', { class: 'top' },
         h('div', { class: 'grow' }, h('h1', null, 'Write Along ✏️'),
-          h('p', { class: 'sub' }, 'Learn to write every letter the right way, in print, cursive and calligraphy.')),
+          h('p', { class: 'sub' }, 'Learn to write every letter the right way, in print, cursive and copperplate.')),
         h('a', { class: 'kbtn solid', href: APK_URL, '--c': C.good }, h('span', { class: 'emo', 'aria-hidden': 'true' }, '📲'), h('span', { class: 'lbl' }, 'Android app')),
         voiceToggle()),
       h('div', { class: 'cards' },
         card('Print', 'Ball-and-stick letters', C.print, 'Aa', 'print', `⭐ ${Progress.total('print')} / ${max}`, '#/letters/print'),
         card('Cursive', 'Joined-up letters', C.cursive, 'Aa', 'cursive', `⭐ ${Progress.total('cursive')} / ${max}`, '#/letters/cursive'),
-        card('Calligraphy', 'Fancy pen letters', C.calligraphy, 'Aa', 'calligraphy', `⭐ ${Progress.total('calligraphy')} / ${max}`, '#/letters/calligraphy'),
+        card('Copperplate', 'Fancy slanted script', C.copperplate, 'Aa', 'copperplate', `⭐ ${Progress.total('copperplate')} / ${max}`, '#/letters/copperplate'),
         card('Free Write', 'Words on big or small lines', C.free, 'hi', 'cursive', '📝 Practice paper', '#/free/print'),
         card('Assignments', 'Copy words and sentences', C.primary, 'I can', 'print', `📋 ${Assignments.list.length} to do`, '#/assignments')),
       h('h2', { class: 'section' }, 'Before you write'),
@@ -827,14 +858,14 @@
       grid.replaceChildren(...(upper ? Glyphs.uppercase : Glyphs.lowercase).map((ch) => {
         const g = Glyphs.get(script, ch);
         return h('a', { class: 'tile', href: `#/lesson/${script}/${encodeURIComponent(ch)}`, 'aria-label': `${scriptLabel(script)} ${ch}` },
-          letterArt(g.polylines, g.bounds, color, { height: 84, pad: 44, nib: script === 'calligraphy' }), starsEl(Progress.letter(script, ch), 15));
+          letterArt(g.polylines, g.bounds, color, { height: 84, pad: 44, nib: script === 'copperplate' }), starsEl(Progress.letter(script, ch), 15));
       }));
     };
     fill();
     const el = h('div', { class: 'scroll' },
       h('div', { class: 'top' },
         roundBtn('⬅️', 'Back', () => go('#/')),
-        h('div', { class: 'grow' }, h('h1', { class: 'sm', style: { color } }, `${scriptLabel(script)} letters`), h('p', { class: 'sub' }, script === 'calligraphy' ? 'Pick a letter. Picture a flat pen tilted like a slanted roof.' : 'Pick a letter to learn.')),
+        h('div', { class: 'grow' }, h('h1', { class: 'sm', style: { color } }, `${scriptLabel(script)} letters`), h('p', { class: 'sub' }, script === 'copperplate' ? 'Pick a letter. Press lightly going up and press harder going down.' : 'Pick a letter to learn.')),
         toggle,
         h('a', { class: 'kbtn', href: `#/free/${script}`, '--c': C.free }, h('span', { class: 'emo' }, '📝'), h('span', { class: 'lbl' }, 'Free Write')),
         voiceToggle()),
@@ -870,7 +901,7 @@
           backRow(`#/letters/${script}`, 'Back to letters'),
           h('div', { class: 'row2' },
             roundBtn('◀', 'Previous letter', () => go(lessonHref(prev)), 'sm'),
-            h('div', { style: { flex: '1', minWidth: '0' } }, letterArt(glyph.polylines, glyph.bounds, color, { height: 76, pad: 34, nib: script === 'calligraphy' })),
+            h('div', { style: { flex: '1', minWidth: '0' } }, letterArt(glyph.polylines, glyph.bounds, color, { height: 76, pad: 34, nib: script === 'copperplate' })),
             roundBtn('▶', 'Next letter', () => go(lessonHref(next)), 'sm')),
           h('div', { class: 'row2' }, h('div', { class: 'title', style: { flex: '1' } }, `${scriptLabel(script)} ${ch}`), starsEl(Progress.letter(script, ch), 14))),
         h('div', { class: 'sec' },
@@ -922,7 +953,7 @@
   }
 
   function freeScreen(startScript) {
-    let script = ['cursive', 'calligraphy'].includes(startScript) ? startScript : 'print';
+    let script = ['cursive', 'copperplate'].includes(startScript) ? startScript : 'print';
     let size = store.get('freeSize', 'big');
     let word = '';
     let pen = 0;
@@ -976,7 +1007,7 @@
           backRow('#/', 'Back'),
           h('div', { class: 'title' }, 'Free Write'),
           sectionLabel('Letters'),
-          choiceRow(['print', 'cursive', 'calligraphy'], script, scriptLabel, (s) => { script = s; render(); }, color),
+          choiceRow(['print', 'cursive', 'copperplate'], script, scriptLabel, (s) => { script = s; render(); }, color),
           sectionLabel('Line size'),
           choiceRow(['big', 'small'], size, (s) => (s === 'big' ? 'Big' : 'Small'), (s) => { size = s; store.set('freeSize', s); render(); }, color)),
         wordsBox,
@@ -1006,7 +1037,7 @@
             h('div', { style: { flex: '1', minWidth: '0' } }, h('div', { class: 't' }, a.title),
               h('div', { class: 'k' }, `${scriptLabel(a.script)} · ${Assignments.kindLabel(a)} · ${a.items.length} tasks`)),
             starsEl(Progress.assignment(a.id), 16)),
-          letterArt(laid.strokes.map((s) => s.points), laid.bounds, color, { height: 64, pad: 40, nib: a.script === 'calligraphy' }));
+          letterArt(laid.strokes.map((s) => s.points), laid.bounds, color, { height: 64, pad: 40, nib: a.script === 'copperplate' }));
       }));
     };
     const input = h('input', { class: 'text', type: 'text', maxlength: '20', value: store.get('name', ''), autocomplete: 'off', 'aria-label': 'Your first name' });
@@ -1088,7 +1119,7 @@
           h('div', { class: 'title' }, `${a.emoji} ${a.title}`),
           h('div', { class: 'hint', style: { color: C.text, fontWeight: '700' } }, `Task ${itemIdx + 1} of ${count}`),
           dots,
-          h('div', { class: 'mini' }, letterArt(laid.strokes.map((s) => s.points), laid.bounds, color, { height: 64, pad: 24, nib: a.script === 'calligraphy' }))),
+          h('div', { class: 'mini' }, letterArt(laid.strokes.map((s) => s.points), laid.bounds, color, { height: 64, pad: 24, nib: a.script === 'copperplate' }))),
         h('div', { class: 'sec' },
           sectionLabel('Line size'),
           choiceRow(['big', 'small'], size, (s) => (s === 'big' ? 'Big' : 'Small'), (s) => { size = s; store.set('taskSize', s); render(); }, color),
@@ -1117,7 +1148,7 @@
     const parts = location.hash.replace(/^#\/?/, '').split('/').map(decodeURIComponent);
     const [page, a, b] = parts;
     let screen = null;
-    const SCRIPTS = ['print', 'cursive', 'calligraphy'];
+    const SCRIPTS = ['print', 'cursive', 'copperplate'];
     if (page === 'letters' && SCRIPTS.includes(a)) screen = lettersScreen(a);
     else if (page === 'lesson' && SCRIPTS.includes(a) && b) screen = lessonScreen(a, b);
     else if (page === 'free') screen = freeScreen(a);

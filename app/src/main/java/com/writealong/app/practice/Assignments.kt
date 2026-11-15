@@ -37,7 +37,7 @@ class Assignment(
 object Assignments {
     private val P = Script.PRINT
     private val C = Script.CURSIVE
-    private val K = Script.CALLIGRAPHY
+    private val K = Script.COPPERPLATE // copperplate
     private val W = Assignment.Kind.WORDS
     private val S = Assignment.Kind.SENTENCES
     private val L = Assignment.Kind.LETTERS
@@ -65,10 +65,10 @@ object Assignments {
         Assignment("c-animal-sentences", "Cursive animal sentences", "🐰", C, S, listOf("The cat is happy", "A fish can swim", "My dog can jump", "Rabbits like carrots")),
         Assignment("c-blends", "Cursive blend words", "🐢", C, W, listOf("frog", "clap", "stop", "drum", "plant")),
         Assignment("c-hard", "Cursive challenge words", "🏆", C, W, listOf("rainbow", "monkey", "yellow", "garden", "pumpkin", "butterfly")),
-        Assignment("k-families", "Pen letter families", "🖌️", K, L, listOf("l i t", "n m h", "o a d", "u y j", "v w x")),
-        Assignment("k-words", "Calligraphy words", "✒️", K, W, listOf("Hello", "Happy", "Merry", "Peace", "Smile", "Dream")),
-        Assignment("k-fancy", "Fancy words", "💎", K, W, listOf("Elegant", "Beautiful", "Wonderful", "Brilliant", "Gorgeous")),
-        Assignment("k-cards", "Greeting card words", "💐", K, S, listOf("Be kind to all", "Dream big", "Happy birthday", "Thank you my friend", "Practice makes perfect", "Welcome home", "You are amazing", "Happy holidays")),
+        Assignment("cp-families", "Copperplate letters", "🖌️", K, L, listOf("l i t", "n m h", "o a d", "u y j", "v w x")),
+        Assignment("cp-words", "Copperplate words", "✒️", K, W, listOf("Hello", "Happy", "Merry", "Peace", "Smile", "Dream")),
+        Assignment("cp-fancy", "Fancy words", "💎", K, W, listOf("Elegant", "Beautiful", "Wonderful", "Brilliant", "Gorgeous")),
+        Assignment("cp-cards", "Greeting card words", "💐", K, S, listOf("Be kind to all", "Dream big", "Happy birthday", "Thank you my friend", "Practice makes perfect", "Welcome home", "You are amazing", "Happy holidays")),
     )
 
     /** Tidies a typed name: "mia rose" -> "Mia Rose". */
@@ -82,7 +82,7 @@ object Assignments {
         return listOf(
             Assignment("name-print", "My name", "😊", P, Assignment.Kind.NAME, listOf(n, n)),
             Assignment("name-cursive", "My name in cursive", "🖋️", C, Assignment.Kind.NAME, listOf(n, n)),
-            Assignment("name-calligraphy", "My name in calligraphy", "🎨", K, Assignment.Kind.NAME, listOf(n, n)),
+            Assignment("name-copperplate", "My name in copperplate", "🎨", K, Assignment.Kind.NAME, listOf(n, n)),
         )
     }
 
