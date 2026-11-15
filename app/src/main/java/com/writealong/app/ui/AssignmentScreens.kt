@@ -128,7 +128,7 @@ private fun AssignmentCard(a: Assignment, stars: Int, onClick: () -> Unit) {
                 }
                 StarRow(stars, 16.dp)
             }
-            LetterArt(sample.strokes.map { it.points }, sample.bounds, color, Modifier.fillMaxWidth().height(64.dp), padUnits = 40f, nib = a.script == Script.COPPERPLATE)
+            LetterArt(sample.strokes.map { it.points }, sample.bounds, color, Modifier.fillMaxWidth().height(64.dp), padUnits = 40f, pen = a.script.pen)
         }
     }
 }
@@ -205,7 +205,7 @@ fun AssignmentScreen(assignment: Assignment, onBack: () -> Unit) {
                 color = Color.White,
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
             ) {
-                LetterArt(preview.strokes.map { it.points }, preview.bounds, color, Modifier.fillMaxWidth().height(64.dp), padUnits = 24f, nib = assignment.script == Script.COPPERPLATE)
+                LetterArt(preview.strokes.map { it.points }, preview.bounds, color, Modifier.fillMaxWidth().height(64.dp), padUnits = 24f, pen = assignment.script.pen)
             }
             SectionLabel("Line size")
             ChoiceRow(PaperSize.entries, size, { it.label }, { size = it }, color)

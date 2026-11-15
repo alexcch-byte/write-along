@@ -2,6 +2,7 @@ package com.writealong.app.practice
 
 import com.writealong.app.glyph.Glyph
 import com.writealong.app.glyph.Pt
+import com.writealong.app.glyph.Pen
 import com.writealong.app.glyph.Script
 import com.writealong.app.glyph.TextLayout
 import kotlin.math.floor
@@ -60,8 +61,8 @@ class Cell(
     val width get() = right - left
 }
 
-/** [nib] = true draws model letters and ink with a pointed copperplate pen. */
-class Sheet(val rows: List<PaperRow>, val cells: List<Cell>, val nib: Boolean = false) {
+/** [pen] is how model letters and ink are drawn: round pencil, pointed pen or broad-edge pen. */
+class Sheet(val rows: List<PaperRow>, val cells: List<Cell>, val pen: Pen = Pen.ROUND) {
     val unit: Float get() = rows.firstOrNull()?.unit ?: 1f
 }
 
@@ -116,7 +117,7 @@ object SheetBuilder {
                 cells += Cell(cells.size, row, r, left, left + cellW, guide, placeGlyph(glyph, row, left + cellW / 2f))
             }
         }
-        return Sheet(rows, cells, glyph.script == Script.COPPERPLATE)
+        return Sheet(rows, cells, glyph.script.pen)
     }
 
     /** A single big spot for the "Watch" demonstration. */
@@ -126,7 +127,7 @@ object SheetBuilder {
         val unit = min(min(heightPx / Paper.ROW, (widthPx - 2 * margin) / (b.width + 80f)), 3.6f * density)
         val row = PaperRow((heightPx - Paper.ROW * unit) / 2f, unit, margin, widthPx - margin)
         val cell = Cell(0, row, 0, margin, widthPx - margin, Guide.FAINT, placeGlyph(glyph, row, widthPx / 2f))
-        return Sheet(listOf(row), listOf(cell), glyph.script == Script.COPPERPLATE)
+        return Sheet(listOf(row), listOf(cell), glyph.script.pen)
     }
 
     fun placeGlyph(glyph: Glyph, row: PaperRow, centerX: Float): List<GhostStroke> {
@@ -154,7 +155,7 @@ object SheetBuilder {
 
         val cells = ArrayList<Cell>()
         val trimmed = text.trim()
-        if (trimmed.isEmpty()) return Sheet(rows, cells, script == Script.COPPERPLATE)
+        if (trimmed.isEmpty()) return Sheet(rows, cells, script.pen)
 
         val pad = 16f
         val maxUnits = (widthPx - 2 * margin) / unit - 2 * pad
@@ -172,7 +173,7 @@ object SheetBuilder {
             }
             cells += Cell(cells.size, row, r, row.left, row.right, guide, ghosts)
         }
-        return Sheet(rows, cells, script == Script.COPPERPLATE)
+        return Sheet(rows, cells, script.pen)
     }
 
     /**
@@ -204,7 +205,7 @@ object SheetBuilder {
             }
             Cell(r, row, r, row.left, row.right, guide, ghosts)
         }
-        return Sheet(rows, cells, script == Script.COPPERPLATE)
+        return Sheet(rows, cells, script.pen)
     }
 
     private fun wrap(text: String, script: Script, maxUnits: Float): List<String> {

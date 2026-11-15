@@ -144,7 +144,12 @@ fun sampleSegments(segs: List<Seg>, step: Float = 1.5f): List<Pt> {
     return out
 }
 
-enum class Script(val label: String) { PRINT("Print"), CURSIVE("Cursive"), COPPERPLATE("Copperplate") }
+/** How ink looks: a round pencil, a pointed copperplate pen, or a flat broad-edge pen. */
+enum class Pen { ROUND, POINTED, BROAD }
+
+enum class Script(val label: String, val pen: Pen = Pen.ROUND) {
+    PRINT("Print"), CURSIVE("Cursive"), COPPERPLATE("Copperplate", Pen.POINTED), GOTHIC("Gothic", Pen.BROAD)
+}
 
 /**
  * A letter, as a teacher would demonstrate it: an ordered list of strokes.

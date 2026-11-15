@@ -37,7 +37,8 @@ class Assignment(
 object Assignments {
     private val P = Script.PRINT
     private val C = Script.CURSIVE
-    private val K = Script.COPPERPLATE // copperplate
+    private val K = Script.COPPERPLATE
+    private val G = Script.GOTHIC
     private val W = Assignment.Kind.WORDS
     private val S = Assignment.Kind.SENTENCES
     private val L = Assignment.Kind.LETTERS
@@ -69,6 +70,9 @@ object Assignments {
         Assignment("cp-words", "Copperplate words", "✒️", K, W, listOf("Hello", "Happy", "Merry", "Peace", "Smile", "Dream")),
         Assignment("cp-fancy", "Fancy words", "💎", K, W, listOf("Elegant", "Beautiful", "Wonderful", "Brilliant", "Gorgeous")),
         Assignment("cp-cards", "Greeting card words", "💐", K, S, listOf("Be kind to all", "Dream big", "Happy birthday", "Thank you my friend", "Practice makes perfect", "Welcome home", "You are amazing", "Happy holidays")),
+        Assignment("g-families", "Gothic letters", "🏰", G, L, listOf("i l t", "n m h", "o c e", "u v w", "b d p")),
+        Assignment("g-words", "Castle words", "⚔️", G, W, listOf("King", "Queen", "Crown", "Knight", "Castle", "Dragon")),
+        Assignment("g-phrases", "Olden-day phrases", "📜", G, S, listOf("Once upon a time", "The brave knight", "Long live the king", "Dragons guard the castle", "Happy new year")),
     )
 
     /** Tidies a typed name: "mia rose" -> "Mia Rose". */
@@ -83,6 +87,7 @@ object Assignments {
             Assignment("name-print", "My name", "😊", P, Assignment.Kind.NAME, listOf(n, n)),
             Assignment("name-cursive", "My name in cursive", "🖋️", C, Assignment.Kind.NAME, listOf(n, n)),
             Assignment("name-copperplate", "My name in copperplate", "🎨", K, Assignment.Kind.NAME, listOf(n, n)),
+            Assignment("name-gothic", "My name in gothic", "🛡️", G, Assignment.Kind.NAME, listOf(n, n)),
         )
     }
 

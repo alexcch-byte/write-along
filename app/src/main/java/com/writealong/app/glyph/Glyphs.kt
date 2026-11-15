@@ -6,6 +6,7 @@ object Glyphs {
     private val print: Map<Char, Glyph> = (PrintGlyphs.lowercase + PrintGlyphs.uppercase).associateBy { it.id }
     private val cursive: Map<Char, Glyph> = (CursiveGlyphs.lowercase + CursiveGlyphs.uppercase).associateBy { it.id }
     private val copperplate: Map<Char, Glyph> = (CopperplateGlyphs.lowercase + CopperplateGlyphs.uppercase).associateBy { it.id }
+    private val gothic: Map<Char, Glyph> = (GothicGlyphs.lowercase + GothicGlyphs.uppercase).associateBy { it.id }
 
     val lowercase: List<Char> = ('a'..'z').toList()
     val uppercase: List<Char> = ('A'..'Z').toList()
@@ -14,6 +15,7 @@ object Glyphs {
         Script.PRINT -> print[ch]
         Script.CURSIVE -> cursive[ch]
         Script.COPPERPLATE -> copperplate[ch]
+        Script.GOTHIC -> gothic[ch]
     }
 
     fun require(script: Script, ch: Char): Glyph = get(script, ch) ?: error("No $script glyph for '$ch'")
@@ -22,6 +24,7 @@ object Glyphs {
         Script.PRINT -> PrintGlyphs.lowercase + PrintGlyphs.uppercase
         Script.CURSIVE -> CursiveGlyphs.lowercase + CursiveGlyphs.uppercase
         Script.COPPERPLATE -> CopperplateGlyphs.lowercase + CopperplateGlyphs.uppercase
+        Script.GOTHIC -> GothicGlyphs.lowercase + GothicGlyphs.uppercase
     }
 }
 
@@ -39,18 +42,19 @@ class TextLine(val text: String, val strokes: List<TextStroke>) {
  */
 object TextLayout {
     private const val PRINT_GAP = 14f
+    private const val GOTHIC_GAP = 9f
     private const val CURSIVE_GAP = 6f
     private const val SPACE = 38f
 
     /** Cursive and copperplate letters join; print letters stand apart. */
     fun layout(text: String, script: Script): TextLine =
-        if (script == Script.PRINT) layoutPrint(text, script) else layoutJoined(text, script)
+        if (script == Script.PRINT || script == Script.GOTHIC) layoutPrint(text, script) else layoutJoined(text, script)
 
-    /** Print letters sit side by side, each with its own lift of the pen. */
+    /** Print and gothic letters sit side by side, each with its own lift of the pen. */
     private fun layoutPrint(text: String, script: Script): TextLine {
         val out = ArrayList<TextStroke>()
         var cursor = 0f
-        val gap = PRINT_GAP
+        val gap = if (script == Script.GOTHIC) GOTHIC_GAP else PRINT_GAP
         text.forEachIndexed { gi, ch ->
             val g = Glyphs.get(script, ch)
             if (g == null) {

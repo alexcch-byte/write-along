@@ -150,6 +150,8 @@
     return out;
   }
 
+  const PEN_STYLE = { print: 'round', cursive: 'round', copperplate: 'pointed', gothic: 'broad' };
+
   class Glyph {
     constructor(script, id, raw) {
       this.script = script;
@@ -188,10 +190,10 @@
   /** Lays a word or sentence out in letter units. Cursive and copperplate letters are joined. */
   function layoutText(text, script) {
     const strokes = [];
-    if (script === 'print') {
-      // Print letters sit side by side, each with its own lift of the pen.
+    if (script === 'print' || script === 'gothic') {
+      // Print and gothic letters sit side by side, each with its own lift of the pen.
       let cursor = 0;
-      const gap = 14;
+      const gap = script === 'gothic' ? 9 : 14;
       [...text].forEach((ch, gi) => {
         const g = Glyphs.get(script, ch);
         if (!g) { cursor += 38; return; }
@@ -295,7 +297,7 @@
           cells.push(makeCell(cells.length, row, r, left, left + cellW, guide, placeGlyph(glyph, row, left + cellW / 2)));
         }
       });
-      return { rows, cells, nib: glyph.script === 'copperplate' };
+      return { rows, cells, pen: PEN_STYLE[glyph.script] };
     },
 
     /** One big letter for the Watch demonstration. */
@@ -303,7 +305,7 @@
       const margin = 14;
       const unit = Math.min(h / Paper.ROW, (w - 2 * margin) / (glyph.bounds.w + 80), 3.6);
       const row = makeRow((h - Paper.ROW * unit) / 2, unit, margin, w - margin);
-      return { rows: [row], cells: [makeCell(0, row, 0, margin, w - margin, 'faint', placeGlyph(glyph, row, w / 2))], nib: glyph.script === 'copperplate' };
+      return { rows: [row], cells: [makeCell(0, row, 0, margin, w - margin, 'faint', placeGlyph(glyph, row, w / 2))], pen: PEN_STYLE[glyph.script] };
     },
 
     /** Free-writing paper, optionally with a word to trace (dotted rows, then faint rows). */
@@ -316,7 +318,7 @@
       for (let r = 0; r < rowsCount; r++) rows.push(makeRow(top0 + r * Paper.ROW * unit, unit, margin, w - margin));
       const cells = [];
       const trimmed = text.trim();
-      if (!trimmed) return { rows, cells, nib: script === 'copperplate' };
+      if (!trimmed) return { rows, cells, pen: PEN_STYLE[script] };
       const pad = 16;
       const maxUnits = (w - 2 * margin) / unit - 2 * pad;
       const lines = wrap(trimmed, script, maxUnits);
@@ -331,7 +333,7 @@
         }));
         cells.push(makeCell(cells.length, row, r, row.left, row.right, guide, ghosts));
       });
-      return { rows, cells, nib: script === 'copperplate' };
+      return { rows, cells, pen: PEN_STYLE[script] };
     },
 
     /** One assignment task: dotted first row, faint second (small lines), then empty rows. */
@@ -353,7 +355,7 @@
         }));
         return makeCell(r, row, r, row.left, row.right, guide, ghosts);
       });
-      return { rows, cells, nib: script === 'copperplate' };
+      return { rows, cells, pen: PEN_STYLE[script] };
     },
   };
 
@@ -608,6 +610,7 @@
         { id: 'name-print', title: 'My name', emoji: '😊', script: 'print', kind: 'name', items: [n, n] },
         { id: 'name-cursive', title: 'My name in cursive', emoji: '🖋️', script: 'cursive', kind: 'name', items: [n, n] },
         { id: 'name-copperplate', title: 'My name in copperplate', emoji: '🎨', script: 'copperplate', kind: 'name', items: [n, n] },
+        { id: 'name-gothic', title: 'My name in gothic', emoji: '🛡️', script: 'gothic', kind: 'name', items: [n, n] },
       ];
     },
     all(name) { return this.forName(name).concat(this.list); },
@@ -624,7 +627,7 @@
   };
 
   global.WA = {
-    P, dist, box, pathLength, resample, pointAlong, prefix, centroid,
+    PEN_STYLE, P, dist, box, pathLength, resample, pointAlong, prefix, centroid,
     Glyphs, layoutText, Paper, Sheets, checkTrace, scoreCell, praise, TRACE_MSG, Assignments, formatName,
   };
 })(typeof window !== 'undefined' ? window : globalThis);

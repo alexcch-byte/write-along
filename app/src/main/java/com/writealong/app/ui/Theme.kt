@@ -22,6 +22,7 @@ object Wa {
     val PrintColor = Color(0xFFFF8A3D)
     val CursiveColor = Color(0xFF9B5DE5)
     val CopperplateColor = Color(0xFFC0395F)
+    val GothicColor = Color(0xFF3D5A80)
     val FreeColor = Color(0xFF14B8A6)
     val Good = Color(0xFF22A861)
     val Warn = Color(0xFFE9A23B)
@@ -59,6 +60,7 @@ object Wa {
         Script.PRINT -> PrintColor
         Script.CURSIVE -> CursiveColor
         Script.COPPERPLATE -> CopperplateColor
+        Script.GOTHIC -> GothicColor
     }
 }
 

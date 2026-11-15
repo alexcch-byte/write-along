@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.writealong.app.data.LocalServices
 import com.writealong.app.glyph.Glyphs
+import com.writealong.app.glyph.Pen
 import com.writealong.app.glyph.Script
 import com.writealong.app.glyph.TextLayout
 import com.writealong.app.practice.Assignments
@@ -88,7 +89,7 @@ fun HomeScreen(onScript: (Script) -> Unit, onFree: () -> Unit, onAssignments: ()
             Column(Modifier.weight(1f)) {
                 Text("Write Along ✏️", style = MaterialTheme.typography.displaySmall, color = Wa.Primary)
                 Text(
-                    "Learn to write every letter the right way, in print, cursive and copperplate.",
+                    "Learn to write every letter the right way, in print, cursive, copperplate and gothic.",
                     style = MaterialTheme.typography.bodyLarge,
                     color = Wa.SubText,
                 )
@@ -100,6 +101,7 @@ fun HomeScreen(onScript: (Script) -> Unit, onFree: () -> Unit, onAssignments: ()
             val printSample = remember { TextLayout.layout("Aa", Script.PRINT) }
             val cursiveSample = remember { TextLayout.layout("Aa", Script.CURSIVE) }
             val copperplateSample = remember { TextLayout.layout("Aa", Script.COPPERPLATE) }
+            val gothicSample = remember { TextLayout.layout("Aa", Script.GOTHIC) }
             val freeSample = remember { TextLayout.layout("hi", Script.CURSIVE) }
             val taskSample = remember { TextLayout.layout("I can", Script.PRINT) }
             HomeCard(
@@ -116,7 +118,7 @@ fun HomeScreen(onScript: (Script) -> Unit, onFree: () -> Unit, onAssignments: ()
             )
             HomeCard(
                 title = "Copperplate", subtitle = "Fancy slanted script", color = Wa.CopperplateColor,
-                art = { LetterArt(copperplateSample.strokes.map { it.points }, copperplateSample.bounds, Wa.CopperplateColor, it, nib = true) },
+                art = { LetterArt(copperplateSample.strokes.map { it.points }, copperplateSample.bounds, Wa.CopperplateColor, it, pen = Pen.POINTED) },
                 footer = "⭐ ${progress.total(Script.COPPERPLATE, all)} / $maxStars",
                 onClick = { onScript(Script.COPPERPLATE) }, modifier = Modifier.weight(1f),
             )
@@ -124,13 +126,13 @@ fun HomeScreen(onScript: (Script) -> Unit, onFree: () -> Unit, onAssignments: ()
                 title = "Free Write", subtitle = "Words on big or small lines", color = Wa.FreeColor,
                 art = { LetterArt(freeSample.strokes.map { it.points }, freeSample.bounds, Wa.FreeColor, it) },
                 footer = "📝 Practice paper",
-                onClick = onFree, modifier = Modifier.weight(1f),
+                onClick = onFree, modifier = Modifier.weight(2f),
             )
             HomeCard(
                 title = "Assignments", subtitle = "Copy words and sentences", color = Wa.Primary,
                 art = { LetterArt(taskSample.strokes.map { it.points }, taskSample.bounds, Wa.Primary, it) },
                 footer = "📋 ${Assignments.list.size} to do",
-                onClick = onAssignments, modifier = Modifier.weight(1f),
+                onClick = onAssignments, modifier = Modifier.weight(2f),
             )
         }
         VGap(18.dp)
@@ -197,7 +199,7 @@ fun LettersScreen(script: Script, onBack: () -> Unit, onLetter: (Char) -> Unit, 
             Gap(12.dp)
             Column(Modifier.weight(1f)) {
                 Text("${script.label} letters", style = MaterialTheme.typography.headlineMedium, color = color)
-                Text(if (script == Script.COPPERPLATE) "Pick a letter. Press lightly going up and press harder going down." else "Pick a letter to learn.", style = MaterialTheme.typography.bodyMedium, color = Wa.SubText)
+                Text(when (script) { Script.COPPERPLATE -> "Pick a letter. Press lightly going up and press harder going down."; Script.GOTHIC -> "Pick a letter. Hold the pen like a flat chisel and keep the corners sharp."; else -> "Pick a letter to learn." }, style = MaterialTheme.typography.bodyMedium, color = Wa.SubText)
             }
             ChoiceRow(
                 options = listOf(false, true), selected = upper,
@@ -226,7 +228,7 @@ fun LettersScreen(script: Script, onBack: () -> Unit, onLetter: (Char) -> Unit, 
                     shadowElevation = 2.dp,
                 ) {
                     Column(Modifier.padding(vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        LetterArt(glyph.polylines, glyph.bounds, color, Modifier.fillMaxWidth().height(84.dp), padUnits = 44f, nib = script == Script.COPPERPLATE)
+                        LetterArt(glyph.polylines, glyph.bounds, color, Modifier.fillMaxWidth().height(84.dp), padUnits = 44f, pen = script.pen)
                         StarRow(progress.stars(script, ch), 15.dp)
                     }
                 }

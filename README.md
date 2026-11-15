@@ -9,8 +9,9 @@ stroke starts, which way it goes, and how letters sit on the writing lines.
 
 ## What's in it
 
-- **Print, Cursive and Copperplate letters** (a–z, A–Z). Copperplate is the joined, steeply slanted
-  script of old letters, written with a pointed pen: hair thin going up, thick on every downstroke. Each letter has three steps:
+- **Print, Cursive, Copperplate and Gothic letters** (a–z, A–Z). Copperplate is the joined, steeply slanted
+  script of old letters, written with a pointed pen: hair thin going up, thick on every downstroke.
+  Gothic is the angular "Old English" hand, written with a flat broad-edge pen. Each letter has three steps:
   1. **Watch**: the letter draws itself stroke by stroke while the steps are read aloud.
   2. **Trace**: follow a highlighted path with a numbered green start dot, arrows and a red stop dot.
      Each stroke is checked as soon as the finger lifts (wrong start, wrong way, off the path, too short).
@@ -28,7 +29,7 @@ stroke starts, which way it goes, and how letters sit on the writing lines.
 | Path | What it is |
 | --- | --- |
 | `app/` | Android app (Kotlin, Jetpack Compose) |
-| `app/src/main/java/.../glyph/` | Letter shapes and stroke order (`PrintGlyphs.kt`, `CursiveGlyphs.kt`, `CopperplateGlyphs.kt`), cursive joining |
+| `app/src/main/java/.../glyph/` | Letter shapes and stroke order (`PrintGlyphs.kt`, `CursiveGlyphs.kt`, `CopperplateGlyphs.kt`, `GothicGlyphs.kt`), cursive joining |
 | `app/src/main/java/.../practice/` | Line layouts, tracing/writing checks, assignment list |
 | `docs/` | Web version, served by GitHub Pages (plain HTML/CSS/JS, no build step) |
 | `docs/js/data.js` | Letter data for the web, **generated** from the Android code (don't edit by hand) |
